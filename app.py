@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS
+from langchain_core.embeddings import Embeddings
 from langchain_ollama import OllamaEmbeddings, ChatOllama
 
 
@@ -84,14 +85,11 @@ def create_retriever():
     # Create Ollama embeddings using:
     # model="nomic-embed-text"
 
-    embeddings = None
-
+    embeddings: Embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
     # TODO 2:
     # Create a FAISS vector store
-
-    vector_store = None
-
+    vector_store = FAISS.from_documents(documents, embeddings)
 
     if vector_store is None:
         return None
@@ -119,7 +117,6 @@ def ask_question(data: QuestionRequest):
             detail="Question cannot be empty"
         )
 
-
     retriever = create_retriever()
 
     if retriever is None:
@@ -128,9 +125,9 @@ def ask_question(data: QuestionRequest):
             detail="Complete TODO 1 and TODO 2 in app.py"
         )
 
-
     # TODO 3:
     # 1. Retrieve relevant documents for data.question
+    docs = FAISS.as_retriever()
     # 2. Combine their page_content into "context"
     # 3. Format the prompt
     # 4. Send it to the LLM
@@ -138,7 +135,6 @@ def ask_question(data: QuestionRequest):
 
     context = ""
     answer = "TODO"
-
 
     return {
         "question": data.question,
